@@ -1,5 +1,8 @@
 package com.techelevator;
 
+import jdk.swing.interop.SwingInterOpUtils;
+import org.junit.vintage.engine.discovery.IsPotentialJUnit4TestClass;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
@@ -61,42 +64,117 @@ public class VendingMachine {
     }
 
     public void printStartMenu() {
-        System.out.println("(1) Display Vending Machine Items");
+        System.out.println("\n(1) Display Vending Machine Items");
         System.out.println("(2) Purchase");
         System.out.println("(3) Exit");
         String response = userInput.nextLine();
         if (response.equals("1")) {
             this.printMap();
+            this.printStartMenu();
         }
         if (response.equals("2")) {
-            //
+            this.printPurchaseProcessMenu();
         }
         if (response.equals("3")) {
+            System.out.println("Thank you for your business. Goodbye! :)");
             System.exit(0);
+        }
+        else {
+            System.out.println("Please choose a valid option");
+            this.printStartMenu();
         }
     }
 
     public void printPurchaseProcessMenu() {
-        System.out.println("Current money provided: $" + this.currentBalance);
+        System.out.println("\nCurrent money provided: $" + this.currentBalance);
         System.out.println("(1) Feed Money");
         System.out.println("(2) Select product");
         System.out.println("(3) Finish Transactions");
         String response = userInput.nextLine();
         if (response.equals("1")) {
-            System.out.println();
+            System.out.println("How much money are you inserting? i.e. 1.00.");
+            String input = userInput.nextLine();
+            if (Double.valueOf(input) < 0) {
+                System.out.println("Unable to accept a negative input amount");
+                this.printPurchaseProcessMenu();
+            }
+            try {
+                this.feedMoney(input);
+            }catch(Exception ex ){
+                System.err.println("You entered an invalid amount, try again dummy.");
+
+            }finally {
+                this.printPurchaseProcessMenu();
+            }
         }
         if (response.equals("2")) {
+            this.printMap();
+            System.out.println("Please enter the item key, i.e. A2");
+            String userKey = userInput.nextLine().toUpperCase();
+            if(!(inventory.containsKey(userKey))){// if user entered key that exists do this:
+                System.err.println("The key you entered does not exist. Try again idiot!");
+                this.printPurchaseProcessMenu();
+            }
+            if(inventory.get(userKey).isSoldOut()){
+                System.out.println("This item is sold out. I am deeply sorry. Please choose a different item.");
+                this.printPurchaseProcessMenu();
+            }
+            if(this.currentBalance.subtract(inventory.get(userKey).getPrice()).compareTo(BigDecimal.valueOf(0)) < 0 ){
+                System.err.println("You are too poor to purchase this item. Provide more funds or pick something you can afford, pleab.");
+                this.printPurchaseProcessMenu();
+            }
+            this.dispense(inventory.get(userKey));
+            this.printPurchaseProcessMenu();
 
         }
         if (response.equals("3")) {
-            //
+            this.finishTransaction();
+            this.printStartMenu();
+        }
+        else {
+            System.out.println("Please select a valid option");
+            this.printPurchaseProcessMenu();
         }
     }
 
     public void feedMoney(String amount) {
-        this.currentBalance.add(new BigDecimal(amount));
+        this.currentBalance = this.currentBalance.add(new BigDecimal(amount));
     }
 
+    public void dispense(Item out){
+        this.currentBalance = this.currentBalance.subtract(out.getPrice());
+        System.out.println(out.getNoise());
+        System.out.println("You've purchased a " + out.getName() + " for $" + out.getPrice());
+        out.setQuantity(out.getQuantity() - 1);
 
+    }
+
+    public void finishTransaction(){
+        BigDecimal totalInPennies = this.currentBalance.multiply(BigDecimal.valueOf(100));
+        BigDecimal numOfQuarters;
+        BigDecimal numOfDimes;
+        BigDecimal numOfNickels;
+        BigDecimal numOfPennies;
+        BigDecimal[] quarterCalculation = totalInPennies.divideAndRemainder(BigDecimal.valueOf(25));
+        numOfQuarters = quarterCalculation[0];
+        BigDecimal[] dimeCalculation = quarterCalculation[1].divideAndRemainder(BigDecimal.valueOf(10));
+        numOfDimes = dimeCalculation[0];
+        BigDecimal[] nickelCalculation = dimeCalculation[1].divideAndRemainder(BigDecimal.valueOf(5));
+        numOfNickels = nickelCalculation[0];
+        numOfPennies = nickelCalculation[1];
+        System.out.println("Returned change: ");
+        if (numOfQuarters.doubleValue() > 0) {
+            System.out.println(numOfQuarters + " quarters");
+        }
+        if (numOfDimes.doubleValue() > 0) {
+            System.out.println(numOfDimes + " dimes");
+        }
+        if (numOfNickels.doubleValue() > 0) {
+            System.out.println(numOfNickels + " nickels");
+        }
+        if (numOfPennies.doubleValue() > 0) {
+            System.out.println(numOfPennies + " pennies");
+        }
+    }
 
 }

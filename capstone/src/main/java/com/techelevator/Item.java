@@ -4,10 +4,13 @@ import java.math.BigDecimal;
 
 public abstract class Item {
 
-    String name;
-    BigDecimal price;
-    int quantity = 5;
-    String noise;
+    private String name;
+    private BigDecimal price;
+
+
+
+    private int quantity = 5;
+    private String noise;
 
     public Item(String name, BigDecimal price, String noise) {
         this.name = name;
@@ -42,6 +45,9 @@ public abstract class Item {
 
     public String getNoise() {
         return this.noise;
+    }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
 }
