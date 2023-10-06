@@ -37,7 +37,6 @@ public class VendingMachine {
             while (fileInput.hasNextLine()) {
                 String line = fileInput.nextLine();
                 String[] lineContents = line.split("\\|");
-                // System.out.println(lineContents[3]);
                 if (lineContents[3].equalsIgnoreCase("Duck")) {
                     Item toy = new Duck(lineContents[1], new BigDecimal(lineContents[2]));
                     inventory.put(lineContents[0], toy);
@@ -97,6 +96,7 @@ public class VendingMachine {
         }
     }
 
+    // PURCHASE MENU
     public void printPurchaseProcessMenu() {
         System.out.println("\nCurrent money provided: $" + this.currentBalance);
         System.out.println("(1) Feed Money");
@@ -112,7 +112,7 @@ public class VendingMachine {
             }
             try {
                 this.feedMoney(input);
-            }catch(Exception ex ){
+            }catch(Exception ex){
                 System.err.println("You entered an invalid amount, try again dummy.");
 
             }finally {
@@ -179,7 +179,7 @@ public class VendingMachine {
         System.out.println("Returned change: ");
         if (numOfQuarters.doubleValue() > 0) {
             if(numOfQuarters.doubleValue() == 1){
-                System.out.println(numOfQuarters.toBigInteger() + "quarter");
+                System.out.println(numOfQuarters.toBigInteger() + " quarter");
             } else {
                 System.out.println(numOfQuarters.toBigInteger() + " quarters");
             }
@@ -187,7 +187,7 @@ public class VendingMachine {
         if (numOfDimes.doubleValue() > 0) {
             if(numOfDimes.doubleValue() == 1){
                 System.out.println(numOfDimes.toBigInteger() + " dime");
-            } else{
+            } else {
                 System.out.println(numOfDimes.toBigInteger() + " dimes");
             }
         }
@@ -210,11 +210,14 @@ public class VendingMachine {
 
     public void printLog(String action,BigDecimal transactionAmount){
         try(PrintWriter writer = new PrintWriter(new FileOutputStream(log,true))){
-            writer.println(LocalDate.now() +" " + LocalTime.now() + " " + action + ": " + transactionAmount + " CURRENT BALANCE: " + this.currentBalance );
+            writer.println(LocalDate.now() + " " + LocalTime.now() + " " + action + ": " + transactionAmount + " CURRENT BALANCE: " + this.currentBalance );
         } catch(FileNotFoundException e) {
             System.err.println("File not found.");
         }
     }
 
+    public BigDecimal getCurrentBalance() {
+        return this.currentBalance;
+    }
 
 }

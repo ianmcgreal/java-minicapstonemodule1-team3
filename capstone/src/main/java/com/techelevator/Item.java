@@ -6,9 +6,6 @@ public abstract class Item {
 
     private String name;
     private BigDecimal price;
-
-
-
     private int quantity = 5;
     private String noise;
 
@@ -16,19 +13,6 @@ public abstract class Item {
         this.name = name;
         this.price = price;
         this.noise = noise;
-    }
-
-    public boolean isSoldOut() {
-        return quantity <= 0;
-    }
-
-    public String isSoldOutPrint() {
-        if (this.isSoldOut()) {
-            return "SOLD OUT";
-        }
-        else {
-            return "QTY: " + this.quantity;
-        }
     }
 
     public String getName() {
@@ -48,6 +32,18 @@ public abstract class Item {
     }
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+    public boolean isSoldOut() {
+        return quantity <= 0;
+    }
+
+    public String isSoldOutPrint() {
+        if (this.isSoldOut()) {
+            return "SOLD OUT";
+        }
+        else {
+            return "QTY: " + this.quantity;
+        }
     }
 
 }
