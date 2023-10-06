@@ -3,9 +3,10 @@ package com.techelevator;
 import jdk.swing.interop.SwingInterOpUtils;
 import org.junit.vintage.engine.discovery.IsPotentialJUnit4TestClass;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -15,9 +16,18 @@ public class VendingMachine {
     BigDecimal currentBalance = new BigDecimal(0);
     Map<String, Item> inventory = new HashMap<String, Item>();
     Scanner userInput = new Scanner(System.in);
+    File log = new File("C:\\Users\\Student\\workspace\\java-minicapstonemodule1-team3\\capstone","log.txt");
 
     public VendingMachine() {
         this.readIn();
+    }
+
+    public void createLogFile() {
+        try {
+            log.createNewFile();
+        } catch (IOException e) {
+            System.err.println("Could not create file.");
+        }
     }
 
     // Read input and create Items from it, add Items to Map
@@ -63,6 +73,7 @@ public class VendingMachine {
         }
     }
 
+    //START MENU
     public void printStartMenu() {
         System.out.println("\n(1) Display Vending Machine Items");
         System.out.println("(2) Purchase");
@@ -78,6 +89,7 @@ public class VendingMachine {
         if (response.equals("3")) {
             System.out.println("Thank you for your business. Goodbye! :)");
             System.exit(0);
+            //OPTIONAL SALES REPORT STUFF HERE ?
         }
         else {
             System.out.println("Please choose a valid option");
@@ -139,6 +151,7 @@ public class VendingMachine {
 
     public void feedMoney(String amount) {
         this.currentBalance = this.currentBalance.add(new BigDecimal(amount));
+        printLog("FEED MONEY",new BigDecimal(amount));
     }
 
     public void dispense(Item out){
@@ -146,7 +159,7 @@ public class VendingMachine {
         System.out.println(out.getNoise());
         System.out.println("You've purchased a " + out.getName() + " for $" + out.getPrice());
         out.setQuantity(out.getQuantity() - 1);
-
+        printLog(out.getName(),out.getPrice());
     }
 
     public void finishTransaction(){
@@ -162,19 +175,46 @@ public class VendingMachine {
         BigDecimal[] nickelCalculation = dimeCalculation[1].divideAndRemainder(BigDecimal.valueOf(5));
         numOfNickels = nickelCalculation[0];
         numOfPennies = nickelCalculation[1];
+        this.currentBalance = new BigDecimal(0);
         System.out.println("Returned change: ");
         if (numOfQuarters.doubleValue() > 0) {
-            System.out.println(numOfQuarters + " quarters");
+            if(numOfQuarters.doubleValue() == 1){
+                System.out.println(numOfQuarters.toBigInteger() + "quarter");
+            } else {
+                System.out.println(numOfQuarters.toBigInteger() + " quarters");
+            }
         }
         if (numOfDimes.doubleValue() > 0) {
-            System.out.println(numOfDimes + " dimes");
+            if(numOfDimes.doubleValue() == 1){
+                System.out.println(numOfDimes.toBigInteger() + " dime");
+            } else{
+                System.out.println(numOfDimes.toBigInteger() + " dimes");
+            }
         }
         if (numOfNickels.doubleValue() > 0) {
-            System.out.println(numOfNickels + " nickels");
+            if(numOfNickels.doubleValue() == 1){
+                System.out.println(numOfNickels.toBigInteger() + " nickel");
+            } else {
+                System.out.println(numOfNickels.toBigInteger() + " nickels");
+            }
         }
         if (numOfPennies.doubleValue() > 0) {
-            System.out.println(numOfPennies + " pennies");
+            if(numOfPennies.doubleValue() == 1){
+                System.out.println(numOfPennies.toBigInteger() + " penny");
+            } else {
+                System.out.println(numOfPennies.toBigInteger() + " pennies");
+            }
+        }
+        printLog("GIVE CHANGE", totalInPennies.divide(BigDecimal.valueOf(100)));
+    }
+
+    public void printLog(String action,BigDecimal transactionAmount){
+        try(PrintWriter writer = new PrintWriter(new FileOutputStream(log,true))){
+            writer.println(LocalDate.now() +" " + LocalTime.now() + " " + action + ": " + transactionAmount + " CURRENT BALANCE: " + this.currentBalance );
+        } catch(FileNotFoundException e) {
+            System.err.println("File not found.");
         }
     }
+
 
 }
