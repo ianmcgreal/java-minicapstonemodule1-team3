@@ -68,7 +68,7 @@ public class VendingMachine {
     public void printMap() {
         for (String key : inventory.keySet()) {
             Item product = inventory.get(key);
-            System.out.println(key + " | " + product.getName() + " | $" + product.getPrice() + " | " + product.isSoldOutPrint());
+            System.out.println(key + " || " + product.getName() + " || $" + product.getPrice() + " || " + product.isSoldOutPrint());
         }
     }
 
@@ -106,15 +106,19 @@ public class VendingMachine {
         if (response.equals("1")) {
             System.out.println("How much money are you inserting? i.e. 1.00.");
             String input = userInput.nextLine();
-            if (Double.valueOf(input) < 0) {
-                System.out.println("Unable to accept a negative input amount");
-                this.printPurchaseProcessMenu();
-            }
             try {
+                if (Double.valueOf(input) < 0) {
+                    System.err.println("Unable to accept a negative input amount");
+                    this.printPurchaseProcessMenu();
+                }
+                if (Double.valueOf(input) % 1 != 0) {
+                    System.err.println("Unable to accept a non-integer amount");
+                    this.printPurchaseProcessMenu();
+                }
                 this.feedMoney(input);
-            }catch(Exception ex){
-                System.err.println("You entered an invalid amount, try again dummy.");
-
+            }
+            catch(Exception ex){
+                System.err.println("You entered an invalid amount, please try again.");
             }finally {
                 this.printPurchaseProcessMenu();
             }
@@ -124,7 +128,7 @@ public class VendingMachine {
             System.out.println("Please enter the item key, i.e. A2");
             String userKey = userInput.nextLine().toUpperCase();
             if(!(inventory.containsKey(userKey))){// if user entered key that exists do this:
-                System.err.println("The key you entered does not exist. Try again idiot!");
+                System.err.println("The key you entered does not exist. Try again!");
                 this.printPurchaseProcessMenu();
             }
             if(inventory.get(userKey).isSoldOut()){
@@ -132,7 +136,7 @@ public class VendingMachine {
                 this.printPurchaseProcessMenu();
             }
             if(this.currentBalance.subtract(inventory.get(userKey).getPrice()).compareTo(BigDecimal.valueOf(0)) < 0 ){
-                System.err.println("You are too poor to purchase this item. Provide more funds or pick something you can afford, pleab.");
+                System.err.println("You are too poor to purchase this item. Provide more funds or pick something you can afford.");
                 this.printPurchaseProcessMenu();
             }
             this.dispense(inventory.get(userKey));
